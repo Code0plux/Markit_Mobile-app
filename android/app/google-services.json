@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "422655336922",
+    "project_id": "markit-a3e21",
+    "storage_bucket": "markit-a3e21.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:422655336922:android:edd34d0ce706a02989a0e3",
+        "android_client_info": {
+          "package_name": "com.example.markit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMwMLqK6QEyBdyBvSNrVJEZHPlyJodJAQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
