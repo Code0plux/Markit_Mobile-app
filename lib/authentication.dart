@@ -31,10 +31,10 @@ class Authentication {
       if (email.isNotEmpty && password.isNotEmpty) {
         await _auth.signInWithEmailAndPassword(
             email: email, password: password);
+        res = "Success";
       } else {
         res = "Enter all the field";
       }
-      res = "Success";
     } catch (e) {
       res = e.toString().split('] ').last;
     }

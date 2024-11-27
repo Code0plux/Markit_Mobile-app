@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:markit/authentication.dart';
+import 'package:markit/backend/backend_operation.dart';
 import 'package:markit/screens/signup_page.dart';
 
 // ignore: camel_case_types
@@ -12,6 +13,7 @@ class loginPage extends StatefulWidget {
 
 // ignore: camel_case_types
 class _loginPageState extends State<loginPage> {
+  final CreateUser = BackendOperation();
   bool isvisible = false;
   TextEditingController emailtxt = TextEditingController();
   TextEditingController passtxt = TextEditingController();
@@ -81,6 +83,7 @@ class _loginPageState extends State<loginPage> {
             child: ElevatedButton(
               // ignore: avoid_print
               onPressed: () {
+                CreateUser.read();
                 loginUser();
               },
               style: ElevatedButton.styleFrom(
