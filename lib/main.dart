@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:markit/screens/coursesetup_page.dart';
 import 'package:markit/screens/login_page.dart';
+import 'package:markit/screens/userhome_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,7 +17,9 @@ class MyApp extends StatelessWidget {
       title: 'Student Marks App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: loginPage(),
+      home: UserhomePage(
+        name: 'arock',
+      ),
     );
   }
 }

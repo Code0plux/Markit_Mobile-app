@@ -13,6 +13,7 @@ class _SignupPageState extends State<SignupPage> {
   TextEditingController emailtxt = TextEditingController();
   TextEditingController passtxt1 = TextEditingController();
   TextEditingController passtxt2 = TextEditingController();
+  TextEditingController nametxt = TextEditingController();
   bool isvisible = false;
   bool isvisible1 = false;
   bool issame() {
@@ -21,8 +22,8 @@ class _SignupPageState extends State<SignupPage> {
 
   void signupUser() async {
     if (issame()) {
-      String res = await Authentication()
-          .signupUser(email: emailtxt.text, password: passtxt1.text);
+      String res = await Authentication().signupUser(
+          email: emailtxt.text, password: passtxt1.text, name: nametxt.text);
       if (res == "Success") {
         print("Success");
       } else {
@@ -71,6 +72,17 @@ class _SignupPageState extends State<SignupPage> {
                       suffixIcon: const Icon(Icons.mail)),
                 ),
               ),
+              Padding(
+                  padding:
+                      const EdgeInsets.only(left: 40.0, right: 40.0, top: 30),
+                  child: TextField(
+                      controller: nametxt,
+                      decoration: InputDecoration(
+                          hintText: "Enter your name",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          suffixIcon: const Icon(Icons.person)))),
               Padding(
                   padding:
                       const EdgeInsets.only(left: 40.0, right: 40.0, top: 30),

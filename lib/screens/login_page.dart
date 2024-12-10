@@ -1,9 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:markit/authentication.dart';
-import 'package:markit/backend/backend_operation.dart';
 import 'package:markit/screens/signup_page.dart';
+import 'package:markit/screens/userhome_page.dart';
 
-// ignore: camel_case_types
 class loginPage extends StatefulWidget {
   const loginPage({super.key});
 
@@ -11,20 +12,75 @@ class loginPage extends StatefulWidget {
   State<loginPage> createState() => _loginPageState();
 }
 
-// ignore: camel_case_types
 class _loginPageState extends State<loginPage> {
-  final CreateUser = BackendOperation();
   bool isvisible = false;
   TextEditingController emailtxt = TextEditingController();
   TextEditingController passtxt = TextEditingController();
+
   void loginUser() async {
+    // Show the loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevents the user from closing the dialog
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(
+            color: Color.fromARGB(255, 213, 150, 224),
+          ),
+        );
+      },
+    );
+
+    // Login the user
     String res = await Authentication()
         .loginUser(email: emailtxt.text, password: passtxt.text);
+
     if (res == "Success") {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Successfully logged In')),
-      );
+      try {
+        // Get the current user's UID
+        String uid = FirebaseAuth.instance.currentUser!.uid;
+
+        // Fetch user details from Firestore using UID
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection("staffs")
+            .doc(uid)
+            .get();
+
+        if (userDoc.exists) {
+          // Extract the user's name
+          Map<String, dynamic> userData =
+              userDoc.data() as Map<String, dynamic>;
+          String userName = userData["name"];
+
+          // Close the loading dialog
+          Navigator.of(context).pop();
+
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Successfully logged In')),
+          );
+
+          // Navigate to the UserhomePage with the name
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserhomePage(
+                name: userName, // Pass the user's name to the next screen
+              ),
+            ),
+          );
+        } else {
+          throw Exception("User document not found");
+        }
+      } catch (e) {
+        Navigator.of(context).pop(); // Close the loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text("Failed to fetch user details: ${e.toString()}")),
+        );
+      }
     } else {
+      Navigator.of(context).pop(); // Close the loading dialog
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(res)),
       );
@@ -51,7 +107,6 @@ class _loginPageState extends State<loginPage> {
             padding: const EdgeInsets.only(left: 40.0, right: 40.0, top: 60),
             child: TextField(
               controller: emailtxt,
-              style: TextStyle(),
               decoration: InputDecoration(
                   hintText: "Enter Your Mail",
                   border: OutlineInputBorder(
@@ -61,29 +116,29 @@ class _loginPageState extends State<loginPage> {
             ),
           ),
           Padding(
-              padding: const EdgeInsets.only(left: 40.0, right: 40.0, top: 30),
-              child: TextField(
-                  controller: passtxt,
-                  obscureText: !isvisible,
-                  decoration: InputDecoration(
-                    hintText: "Enter password",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    suffixIcon: InkWell(
-                      onTap: () => setState(() {
-                        isvisible = !isvisible;
-                      }),
-                      child: Icon(
-                          !isvisible ? Icons.visibility_off : Icons.visibility),
-                    ),
-                  ))),
+            padding: const EdgeInsets.only(left: 40.0, right: 40.0, top: 30),
+            child: TextField(
+              controller: passtxt,
+              obscureText: !isvisible,
+              decoration: InputDecoration(
+                hintText: "Enter password",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                suffixIcon: InkWell(
+                  onTap: () => setState(() {
+                    isvisible = !isvisible;
+                  }),
+                  child: Icon(
+                      !isvisible ? Icons.visibility_off : Icons.visibility),
+                ),
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 30.0),
             child: ElevatedButton(
-              // ignore: avoid_print
               onPressed: () {
-                CreateUser.read();
                 loginUser();
               },
               style: ElevatedButton.styleFrom(
@@ -107,9 +162,9 @@ class _loginPageState extends State<loginPage> {
               GestureDetector(
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SignupPage()));
+                    context,
+                    MaterialPageRoute(builder: (context) => const SignupPage()),
+                  );
                 },
                 child: const Text(
                   "Signup",
@@ -121,7 +176,7 @@ class _loginPageState extends State<loginPage> {
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
