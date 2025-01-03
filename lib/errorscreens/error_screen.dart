@@ -24,7 +24,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       bottomSheet: Center(
         child: Text(
           "An error has occurred",

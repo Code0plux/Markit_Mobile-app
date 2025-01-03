@@ -57,7 +57,7 @@ class _loginPageState extends State<loginPage> {
 
           // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Successfully logged In')),
+            const SnackBar(content: Text('Successfully logged In')),
           );
 
           // Navigate to the UserhomePage with the name
@@ -158,7 +158,7 @@ class _loginPageState extends State<loginPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("No account? "),
+              const Text("No account? "),
               GestureDetector(
                 onTap: () {
                   Navigator.push(

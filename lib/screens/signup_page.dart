@@ -33,7 +33,7 @@ class _SignupPageState extends State<SignupPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Password are not same")),
+        const SnackBar(content: Text("Password are not same")),
       );
     }
   }
