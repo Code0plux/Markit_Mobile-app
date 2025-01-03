@@ -68,15 +68,20 @@ class CourseSetupScreen extends StatelessWidget {
 
                 for (int i = 1; i <= 10; i++) {
                   // Add D.no data as sub-collections/documents
+                  final exRef = courseRef.collection("Ex $i");
+
+                  // Create D.no documents
                   for (int dno = startDno; dno <= endDno; dno++) {
-                    await courseRef
-                        .collection("Ex $i")
-                        .doc(dno.toString())
-                        .set({
+                    await exRef.doc(dno.toString()).set({
                       'preparationMark': 0,
                       'vivaVoce': 0,
                     });
                   }
+
+                  // Create the date document
+                  await exRef.doc("date").set({
+                    'date': null,
+                  });
                 }
 
                 ScaffoldMessenger.of(context).showSnackBar(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class MarksEntryScreen extends StatefulWidget {
   final String courseId;
@@ -21,6 +22,7 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
   final TextEditingController vivaVoceController = TextEditingController();
   final TextEditingController dnoController = TextEditingController();
   bool isLoading = false;
+  DateTime? selectedDate;
 
   @override
   void initState() {
@@ -75,6 +77,7 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
         await fetchDnoRange(
             selectedExercise!); // Fetch the Dno range dynamically
         fetchMarks(); // Fetch marks for the first Dno
+        fetchDate(); // Fetch date for the first exercise
       }
     } catch (e) {
       print('Error fetching exercises: $e');
@@ -137,6 +140,48 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
     }
   }
 
+  Future<void> fetchDate() async {
+    if (selectedExercise == null) return;
+
+    final dateDoc = await FirebaseFirestore.instance
+        .collection('Courses')
+        .doc(widget.courseId)
+        .collection(selectedExercise!)
+        .doc('date')
+        .get();
+
+    final dateData = dateDoc.data();
+    if (dateData != null && dateData['date'] != null) {
+      setState(() {
+        selectedDate = DateTime.tryParse(dateData['date']);
+      });
+    } else {
+      setState(() {
+        selectedDate = null;
+      });
+    }
+  }
+
+  Future<void> saveDate(DateTime date) async {
+    if (selectedExercise == null) return;
+
+    final formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    await FirebaseFirestore.instance
+        .collection('Courses')
+        .doc(widget.courseId)
+        .collection(selectedExercise!)
+        .doc('date')
+        .set({'date': formattedDate});
+
+    setState(() {
+      selectedDate = date;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Date saved for $selectedExercise')),
+    );
+  }
+
   Future<void> saveMarks() async {
     if (selectedExercise == null) return;
 
@@ -195,6 +240,19 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
     }
   }
 
+  void pickDate() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+
+    if (pickedDate != null) {
+      saveDate(pickedDate);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -217,6 +275,7 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
                         dnoController.text = currentDno.toString();
                       });
                       fetchMarks();
+                      fetchDate();
                     },
                     items: exerciseList
                         .map((exercise) => DropdownMenuItem(
@@ -226,9 +285,23 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
                         .toList(),
                   ),
                   const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: pickDate,
+                    child: Text('Pick Date'),
+                  ),
+                  if (selectedDate != null)
+                    Text(
+                        'Selected Date: ${DateFormat('yyyy-MM-dd').format(selectedDate!)}'),
+                  const SizedBox(height: 16),
                   TextField(
                     controller: preparationMarkController,
                     decoration: InputDecoration(labelText: 'Preparation Mark'),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: vivaVoceController,
+                    decoration: InputDecoration(labelText: 'Viva Voce'),
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 16),
