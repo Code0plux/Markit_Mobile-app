@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:markit/screens/coursesetup_page.dart';
+import 'package:markit/screens/login_page.dart';
 import 'package:markit/screens/markentry_page.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserhomePage extends StatefulWidget {
   final String name; // Staff name
@@ -15,6 +17,11 @@ class UserhomePage extends StatefulWidget {
 }
 
 class _UserhomePageState extends State<UserhomePage> {
+  Future<void> clearUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userName');
+  }
+
   // Function to generate and download the PDF
 // Function to generate and download the PDF
   Future<void> _generateAndDownloadPDF(String courseId) async {
@@ -29,6 +36,8 @@ class _UserhomePageState extends State<UserhomePage> {
 
       final courseData = courseSnapshot.data();
       final totalExercises = courseData?['totalex'] ?? 0;
+      final details = courseData?['classdetails'] ?? 0;
+      print('Class Details: $details');
 
       // Generate list of exercises (e.g., Ex1, Ex2, ..., ExN)
       List<String> exerciseList =
@@ -73,10 +82,12 @@ class _UserhomePageState extends State<UserhomePage> {
               .doc(dno.toString())
               .get();
 
-          final markData = markDoc.data();
+          final detailsref = await FirebaseFirestore.instance
+              .collection('Courses')
+              .doc(courseId)
+              .get();
 
-          print(
-              'Mark Data for Dno $dno, $exercise: $markData'); // Debugging output
+          final markData = markDoc.data();
 
           final prepMark = markData?.containsKey('preparationMark') == true
               ? markData!['preparationMark']
@@ -105,7 +116,7 @@ class _UserhomePageState extends State<UserhomePage> {
       // Table Rows
       final dataRows = marksData.map((row) {
         return [
-          row['Dno'].toString(),
+          '$details${row['Dno']}',
           for (var ex in exerciseList) row['${ex}_prep'].toString(),
           for (var ex in exerciseList) row['${ex}_viva'].toString(),
         ];
@@ -113,7 +124,6 @@ class _UserhomePageState extends State<UserhomePage> {
 
       print('Data Rows: $dataRows');
 
-      // Generate PDF
       pdf.addPage(pw.Page(
         pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) {
@@ -128,7 +138,6 @@ class _UserhomePageState extends State<UserhomePage> {
               pw.Table(
                 border: pw.TableBorder.all(),
                 children: [
-                  // First row with D.no and exercise headers
                   pw.TableRow(
                     children: [
                       pw.Container(
@@ -140,7 +149,7 @@ class _UserhomePageState extends State<UserhomePage> {
                               fontWeight: pw.FontWeight.bold, fontSize: 12),
                         ),
                       ),
-                      for (var ex in exerciseList)
+                      for (var ex in exerciseList) ...[
                         pw.Container(
                           alignment: pw.Alignment.center,
                           padding: const pw.EdgeInsets.all(8),
@@ -150,12 +159,12 @@ class _UserhomePageState extends State<UserhomePage> {
                                 fontWeight: pw.FontWeight.bold, fontSize: 12),
                           ),
                         ),
+                      ]
                     ],
                   ),
-                  // Second row with PP and OP subheaders
                   pw.TableRow(
                     children: [
-                      pw.Container(), // Empty for "D.no" column
+                      pw.Container(),
                       for (var ex in exerciseList)
                         pw.Column(
                           children: [
@@ -171,7 +180,6 @@ class _UserhomePageState extends State<UserhomePage> {
                         ),
                     ],
                   ),
-                  // Data rows
                   for (var row in marksData)
                     pw.TableRow(
                       children: [
@@ -179,7 +187,7 @@ class _UserhomePageState extends State<UserhomePage> {
                           alignment: pw.Alignment.center,
                           padding: const pw.EdgeInsets.all(8),
                           child: pw.Text(
-                            row['Dno'].toString(),
+                            '$details${row['Dno']}',
                             style: pw.TextStyle(fontSize: 10),
                           ),
                         ),
@@ -204,8 +212,6 @@ class _UserhomePageState extends State<UserhomePage> {
           );
         },
       ));
-
-      // Download PDF
       await Printing.layoutPdf(
           onLayout: (PdfPageFormat format) async => pdf.save());
 
@@ -220,14 +226,11 @@ class _UserhomePageState extends State<UserhomePage> {
     }
   }
 
-// Helper function to parse marks safely
   dynamic _parseMark(dynamic mark) {
     if (mark == null) return '-';
     if (mark is int || mark is double) return mark;
     return int.tryParse(mark.toString()) ?? '-';
   }
-
-  // Helper function to parse marks safe
 
   @override
   Widget build(BuildContext context) {
@@ -237,6 +240,24 @@ class _UserhomePageState extends State<UserhomePage> {
           widget.name,
           style: TextStyle(fontSize: 20),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh), // Refresh Button
+            onPressed: () {
+              setState(() {}); // Reloads the page by triggering a rebuild
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await clearUserData();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => loginPage()),
+              );
+            },
+          ),
+        ],
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 224, 147, 238),
       ),
@@ -311,7 +332,9 @@ class _UserhomePageState extends State<UserhomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CourseSetupScreen(),
+                  builder: (context) => CourseSetupScreen(
+                    staffName: widget.name,
+                  ),
                 ),
               );
             },

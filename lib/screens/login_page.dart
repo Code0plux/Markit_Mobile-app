@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:markit/authentication.dart';
 import 'package:markit/screens/signup_page.dart';
 import 'package:markit/screens/userhome_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class loginPage extends StatefulWidget {
   const loginPage({super.key});
@@ -16,6 +17,11 @@ class _loginPageState extends State<loginPage> {
   bool isvisible = false;
   TextEditingController emailtxt = TextEditingController();
   TextEditingController passtxt = TextEditingController();
+
+  Future<void> saveUserData(String name) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userName', name);
+  }
 
   void loginUser() async {
     // Show the loading dialog
@@ -59,7 +65,7 @@ class _loginPageState extends State<loginPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Successfully logged In')),
           );
-
+          await saveUserData(userName);
           // Navigate to the UserhomePage with the name
           Navigator.push(
             context,

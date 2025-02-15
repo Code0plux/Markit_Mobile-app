@@ -16,6 +16,7 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
   late int endDno;
   late int currentDno;
   String? selectedExercise;
+  late String courseDetails;
   List<String> exerciseList = [];
   final TextEditingController preparationMarkController =
       TextEditingController();
@@ -90,7 +91,7 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
 
   Future<void> fetchDnoRange(String exercise) async {
     try {
-      // Query all documents in the selected exercise collection
+      // Fetch all document IDs (D.nos) from Firebase
       final querySnapshot = await FirebaseFirestore.instance
           .collection('Courses')
           .doc(widget.courseId)
@@ -98,16 +99,25 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Extract document IDs and sort them to determine start and end Dno
+        // Extract and sort D.no values
         final docIds = querySnapshot.docs
             .map((doc) => int.tryParse(doc.id))
             .whereType<int>()
             .toList();
         docIds.sort();
+
+        // Set startDno and endDno dynamically
         startDno = docIds.first;
         endDno = docIds.last;
         currentDno = startDno;
-        dnoController.text = currentDno.toString();
+
+        // Update UI
+        setState(() {
+          dnoController.text = currentDno.toString();
+        });
+
+        // Fetch initial marks
+        fetchMarks();
       } else {
         throw Exception('No documents found in exercise collection');
       }
@@ -116,7 +126,9 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
       startDno = 1;
       endDno = 1;
       currentDno = startDno;
-      dnoController.text = currentDno.toString();
+      setState(() {
+        dnoController.text = currentDno.toString();
+      });
     }
   }
 
@@ -204,10 +216,25 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
   }
 
   void nextDno() async {
-    await saveMarks();
-    if (currentDno < endDno) {
+    await saveMarks(); // Save current marks before switching
+
+    // Move to the next available D.no
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('Courses')
+        .doc(widget.courseId)
+        .collection(selectedExercise!)
+        .get();
+
+    final docIds = querySnapshot.docs
+        .map((doc) => int.tryParse(doc.id))
+        .whereType<int>()
+        .toList();
+    docIds.sort();
+
+    int currentIndex = docIds.indexOf(currentDno);
+    if (currentIndex != -1 && currentIndex < docIds.length - 1) {
       setState(() {
-        currentDno++;
+        currentDno = docIds[currentIndex + 1];
         dnoController.text = currentDno.toString();
       });
       fetchMarks();
@@ -215,10 +242,24 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
   }
 
   void previousDno() async {
-    await saveMarks();
-    if (currentDno > startDno) {
+    await saveMarks(); // Save current marks before switching
+
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('Courses')
+        .doc(widget.courseId)
+        .collection(selectedExercise!)
+        .get();
+
+    final docIds = querySnapshot.docs
+        .map((doc) => int.tryParse(doc.id))
+        .whereType<int>()
+        .toList();
+    docIds.sort();
+
+    int currentIndex = docIds.indexOf(currentDno);
+    if (currentIndex > 0) {
       setState(() {
-        currentDno--;
+        currentDno = docIds[currentIndex - 1];
         dnoController.text = currentDno.toString();
       });
       fetchMarks();
@@ -296,12 +337,6 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
                   TextField(
                     controller: preparationMarkController,
                     decoration: InputDecoration(labelText: 'Preparation Mark'),
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: vivaVoceController,
-                    decoration: InputDecoration(labelText: 'Viva Voce'),
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 16),
