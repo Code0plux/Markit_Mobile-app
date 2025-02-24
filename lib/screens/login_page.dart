@@ -31,7 +31,7 @@ class _loginPageState extends State<loginPage> {
       builder: (BuildContext context) {
         return const Center(
           child: CircularProgressIndicator(
-            color: Color.fromARGB(255, 213, 150, 224),
+            color: Colors.deepPurple,
           ),
         );
       },
@@ -103,14 +103,18 @@ class _loginPageState extends State<loginPage> {
             child: Padding(
               padding: EdgeInsets.fromLTRB(0, 95, 0, 0),
               child: Text(
-                "Log in",
+                "Log In",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(top: 30.0),
+            child: Image.asset("lib/asserts/logo.jpg", height: 200, width: 200),
+          ),
           const SizedBox(height: 30),
           Padding(
-            padding: const EdgeInsets.only(left: 40.0, right: 40.0, top: 60),
+            padding: const EdgeInsets.only(left: 40.0, right: 40.0, top: 30),
             child: TextField(
               controller: emailtxt,
               decoration: InputDecoration(
@@ -121,6 +125,27 @@ class _loginPageState extends State<loginPage> {
                   suffixIcon: const Icon(Icons.mail)),
             ),
           ),
+          // Padding(
+          //   padding: const EdgeInsets.only(left: 40.0, right: 40.0, top: 30),
+          //   child: TextField(
+          //     controller: passtxt,
+          //     obscureText: !isvisible,
+          //     decoration: InputDecoration(
+          //       hintText: "Enter password",
+          //       border: OutlineInputBorder(
+          //         borderRadius: BorderRadius.circular(20),
+          //       ),
+          //       suffixIcon: InkWell(
+          //         onTap: () => setState(() {
+          //           isvisible = !isvisible;
+          //         }),
+          //         child: Icon(
+          //             !isvisible ? Icons.visibility_off : Icons.visibility),
+          //       ),
+          //     ),
+          //   ),
+
+          // ),
           Padding(
             padding: const EdgeInsets.only(left: 40.0, right: 40.0, top: 30),
             child: TextField(
@@ -141,6 +166,44 @@ class _loginPageState extends State<loginPage> {
               ),
             ),
           ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 40.0, top: 8),
+              child: TextButton(
+                onPressed: () async {
+                  if (emailtxt.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text("Please enter your email first.")),
+                    );
+                    return;
+                  }
+
+                  try {
+                    await FirebaseAuth.instance
+                        .sendPasswordResetEmail(email: emailtxt.text.trim());
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text("Password reset email sent.")),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Error: ${e.toString()}")),
+                    );
+                  }
+                },
+                child: const Text(
+                  "Forgot Password?",
+                  style: TextStyle(
+                    color: Color(0xFF58B4FF), // Light Blue Color
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           Padding(
             padding: const EdgeInsets.only(top: 30.0),
             child: ElevatedButton(
@@ -148,7 +211,7 @@ class _loginPageState extends State<loginPage> {
                 loginUser();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 95, 57, 102),
+                backgroundColor: Colors.deepPurple,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(100),
                 ),
@@ -176,7 +239,7 @@ class _loginPageState extends State<loginPage> {
                   "Signup",
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.black,
+                    color: Color.fromARGB(255, 88, 180, 255),
                     fontWeight: FontWeight.bold,
                   ),
                 ),

@@ -298,15 +298,31 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Marks Entry - ${widget.courseId}'),
+        title: Text(
+          'Marks Entry - ${widget.courseId.toUpperCase()}', // Convert courseId to uppercase
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.deepPurple, // Consistent AppBar color
+        elevation: 10, // Subtle shadow
+        iconTheme:
+            const IconThemeData(color: Colors.white), // White back button
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                color: Colors.deepPurple, // Consistent loading indicator color
+              ),
+            )
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Dropdown for Exercise Selection
                   DropdownButton<String>(
                     value: selectedExercise,
                     onChanged: (value) {
@@ -321,50 +337,167 @@ class _MarksEntryScreenState extends State<MarksEntryScreen> {
                     items: exerciseList
                         .map((exercise) => DropdownMenuItem(
                               value: exercise,
-                              child: Text(exercise),
+                              child: Text(
+                                exercise
+                                    .toUpperCase(), // Convert exercise to uppercase
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.deepPurple, // Consistent color
+                                ),
+                              ),
                             ))
                         .toList(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.deepPurple, // Consistent color
+                    ),
+                    dropdownColor: Colors.white, // Dropdown background color
+                    icon: Icon(Icons.arrow_drop_down, color: Colors.deepPurple),
+                    isExpanded: true,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20), // Consistent spacing
+
+                  // Date Picker Button
                   ElevatedButton(
                     onPressed: pickDate,
-                    child: Text('Pick Date'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Colors.deepPurple, // Consistent button color
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12), // Button padding
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12), // Rounded corners
+                      ),
+                    ),
+                    child: const Text(
+                      'Pick Date',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
+                  const SizedBox(height: 10), // Consistent spacing
+
+                  // Selected Date Display
                   if (selectedDate != null)
                     Text(
-                        'Selected Date: ${DateFormat('yyyy-MM-dd').format(selectedDate!)}'),
-                  const SizedBox(height: 16),
+                      'Selected Date: ${DateFormat('yyyy-MM-dd').format(selectedDate!)}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.deepPurple, // Consistent text color
+                      ),
+                    ),
+                  const SizedBox(height: 20), // Consistent spacing
+
+                  // Preparation Mark TextField
                   TextField(
                     controller: preparationMarkController,
-                    decoration: InputDecoration(labelText: 'Preparation Mark'),
+                    decoration: InputDecoration(
+                      labelText: 'Preparation Mark',
+                      labelStyle: TextStyle(color: Colors.deepPurple),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.deepPurple, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.deepPurple, width: 1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     keyboardType: TextInputType.number,
+                    style: TextStyle(color: Colors.deepPurple), // Text color
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20), // Consistent spacing
+
+                  // Viva Voce TextField
                   TextField(
                     controller: vivaVoceController,
-                    decoration: InputDecoration(labelText: 'Viva Voce'),
+                    decoration: InputDecoration(
+                      labelText: 'Viva Voce',
+                      labelStyle: TextStyle(color: Colors.deepPurple),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.deepPurple, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.deepPurple, width: 1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     keyboardType: TextInputType.number,
+                    style: TextStyle(color: Colors.deepPurple), // Text color
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20), // Consistent spacing
+
+                  // Dno Navigation Row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Previous Dno Button
                       ElevatedButton(
                         onPressed: previousDno,
-                        child: Text('Previous Dno'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Colors.deepPurple, // Consistent button color
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12), // Button padding
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(12), // Rounded corners
+                          ),
+                        ),
+                        child: const Text(
+                          'Previous Dno',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                       ),
+
+                      // Dno TextField
                       SizedBox(
                         width: 100,
                         child: TextField(
                           controller: dnoController,
-                          decoration: InputDecoration(labelText: 'Dno'),
+                          decoration: InputDecoration(
+                            labelText: 'Dno',
+                            labelStyle: TextStyle(color: Colors.deepPurple),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Colors.deepPurple, width: 2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Colors.deepPurple, width: 1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                           keyboardType: TextInputType.number,
+                          style:
+                              TextStyle(color: Colors.deepPurple), // Text color
                           onSubmitted: (value) => updateDno(),
                         ),
                       ),
+
+                      // Next Dno Button
                       ElevatedButton(
                         onPressed: nextDno,
-                        child: Text('Next Dno'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Colors.deepPurple, // Consistent button color
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12), // Button padding
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(12), // Rounded corners
+                          ),
+                        ),
+                        child: const Text(
+                          'Next Dno',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                       ),
                     ],
                   ),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:markit/screens/userhome_page.dart';
 
 class CourseSetupScreen extends StatelessWidget {
   final TextEditingController courseIdController = TextEditingController();
@@ -13,26 +14,74 @@ class CourseSetupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Setup Course')),
+      appBar: AppBar(
+        title: const Text(
+          'Setup Course',
+          style: TextStyle(
+              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        backgroundColor: Colors.deepPurple,
+        elevation: 10,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: courseIdController,
-              decoration: const InputDecoration(labelText: 'Course Name'),
+              decoration: InputDecoration(
+                labelText: 'Course Name',
+                labelStyle: TextStyle(color: Colors.deepPurple),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.deepPurple, width: 2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.deepPurple, width: 1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: Icon(Icons.school, color: Colors.deepPurple),
+              ),
             ),
+            const SizedBox(height: 20),
             TextField(
               controller: startDnoController,
-              decoration: const InputDecoration(labelText: 'Starting D.no'),
-              inputFormatters: [LengthLimitingTextInputFormatter(8)],
-            ),
-            TextField(
-              controller: endDnoController,
-              decoration: const InputDecoration(labelText: 'Ending D.no'),
+              decoration: InputDecoration(
+                labelText: 'Starting D.no',
+                labelStyle: TextStyle(color: Colors.deepPurple),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.deepPurple, width: 2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.deepPurple, width: 1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: Icon(Icons.numbers, color: Colors.deepPurple),
+              ),
               inputFormatters: [LengthLimitingTextInputFormatter(8)],
             ),
             const SizedBox(height: 20),
+            TextField(
+              controller: endDnoController,
+              decoration: InputDecoration(
+                labelText: 'Ending D.no',
+                labelStyle: TextStyle(color: Colors.deepPurple),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.deepPurple, width: 2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.deepPurple, width: 1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: Icon(Icons.numbers, color: Colors.deepPurple),
+              ),
+              inputFormatters: [LengthLimitingTextInputFormatter(8)],
+            ),
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () async {
                 try {
@@ -150,6 +199,14 @@ class CourseSetupScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Course setup successfully!')),
                   );
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => UserhomePage(
+                              name: staffName,
+                            )), // Replace HomePage() with your actual home screen widget
+                    (Route<dynamic> route) => false,
+                  );
                 } catch (e) {
                   print('Error: $e');
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -157,7 +214,18 @@ class CourseSetupScreen extends StatelessWidget {
                   );
                 }
               },
-              child: const Text('Create Course'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Create Course',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
             ),
           ],
         ),

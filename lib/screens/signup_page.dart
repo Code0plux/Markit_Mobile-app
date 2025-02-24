@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:markit/authentication.dart';
 import 'package:markit/screens/login_page.dart';
+import 'package:markit/screens/userhome_page.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -21,12 +22,31 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void signupUser() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevents the user from closing the dialog
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(
+            color: Colors.deepPurple,
+          ),
+        );
+      },
+    );
     if (issame()) {
       String res = await Authentication().signupUser(
           email: emailtxt.text, password: passtxt1.text, name: nametxt.text);
       if (res == "Success") {
         print("Success");
+        Navigator.pop(context);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => UserhomePage(
+                      name: nametxt.text,
+                    )));
       } else {
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(res)),
         );
@@ -51,12 +71,17 @@ class _SignupPageState extends State<SignupPage> {
             children: [
               const Center(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                  padding: EdgeInsets.only(top: 20.0),
                   child: Text(
                     "Sign up",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
                   ),
                 ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: Image.asset("lib/asserts/logo.jpg",
+                    height: 200, width: 200),
               ),
               const SizedBox(height: 30),
               Padding(
@@ -131,7 +156,7 @@ class _SignupPageState extends State<SignupPage> {
                     signupUser();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 95, 57, 102),
+                    backgroundColor: Colors.deepPurple,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
@@ -155,7 +180,7 @@ class _SignupPageState extends State<SignupPage> {
                   "Already Have an account?",
                   style: TextStyle(
                       fontSize: 14,
-                      color: Colors.black,
+                      color: Colors.lightBlue,
                       fontWeight: FontWeight.bold),
                 ),
               ),
