@@ -5,10 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:markit/screens/coursesetup_page.dart';
 import 'package:markit/screens/login_page.dart';
 import 'package:markit/screens/markentry_page.dart';
+import 'package:markit/screens/profile.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UserhomePage extends StatefulWidget {
   final String name; // Staff name
@@ -48,7 +50,7 @@ class _UserhomePageState extends State<UserhomePage> {
           .collection('Courses')
           .doc(courseId)
           .get();
-
+      final name = widget.name;
       final courseData = courseSnapshot.data();
       final totalExercises = courseData?['totalex'] ?? 0;
       final details = courseData?['classdetails'] ?? 'N/A';
@@ -143,10 +145,59 @@ class _UserhomePageState extends State<UserhomePage> {
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4, // Keep Portrait
           build: (pw.Context context) => [
-            pw.Text(
-              'Marks Report - $courseId',
-              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+            pw.Container(
+              alignment: pw.Alignment.center,
+              padding: const pw.EdgeInsets.all(4),
+              child: pw.Text('MARK REPORT',
+                  style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold, fontSize: 20)),
             ),
+            pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.start,
+                    children: [
+                      pw.Text(
+                        'Course Name: ',
+                        style: pw.TextStyle(
+                          fontSize: 12,
+                          fontWeight:
+                              pw.FontWeight.normal, // Regular text for label
+                        ),
+                      ),
+                      pw.Text(
+                        courseId, // Course name in bold
+                        style: pw.TextStyle(
+                          fontSize: 12,
+                          fontWeight:
+                              pw.FontWeight.bold, // Bold for the course name
+                        ),
+                      ),
+                    ],
+                  ),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.end,
+                    children: [
+                      pw.Text(
+                        'Staff Name: ',
+                        style: pw.TextStyle(
+                          fontSize: 12,
+                          fontWeight:
+                              pw.FontWeight.normal, // Regular text for label
+                        ),
+                      ),
+                      pw.Text(
+                        name, // Staff name in bold
+                        style: pw.TextStyle(
+                          fontSize: 12,
+                          fontWeight:
+                              pw.FontWeight.bold, // Bold for the staff name
+                        ),
+                      ),
+                    ],
+                  ),
+                ]),
             pw.SizedBox(height: 20),
             pw.Table(
               border: pw.TableBorder.all(),
@@ -249,9 +300,18 @@ class _UserhomePageState extends State<UserhomePage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          widget.name,
+          (widget.name).toUpperCase(),
           style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        leading: Builder(
+          // Fix for missing menu icon
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu, color: Colors.white),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
         ),
         actions: [
           IconButton(
@@ -260,29 +320,82 @@ class _UserhomePageState extends State<UserhomePage> {
               setState(() {});
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: () async {
-              await clearUserData();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => loginPage()),
-              );
-            },
-          ),
         ],
         centerTitle: true,
         backgroundColor: Colors.deepPurple, // A more professional color
         elevation: 10, // Adds a subtle shadow
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.deepPurple,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.account_circle, size: 60, color: Colors.white),
+                  SizedBox(height: 8),
+                  Text(
+                    widget.name.toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.person, color: Colors.deepPurple),
+              title: Text("Profile"),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Profile(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+                leading: Icon(Icons.info, color: Colors.deepPurple),
+                title: Text("About"),
+                onTap: () async {
+                  final Uri url = Uri.parse("https://www.sjctni.edu/");
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Could not launch URL")),
+                    );
+                  }
+                }),
+            ListTile(
+              leading: Icon(Icons.logout, color: Colors.deepPurple),
+              title: Text("Logout"),
+              onTap: () async {
+                await clearUserData();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => loginPage()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: Column(
         children: [
           const SizedBox(height: 20),
           const Center(
             child: Text(
-              "Courses",
+              "COURSES",
               style: TextStyle(
-                  fontSize: 36,
+                  fontSize: 26,
                   fontWeight: FontWeight.bold,
                   color: Color.fromARGB(255, 49, 34, 16)),
             ),
@@ -340,10 +453,11 @@ class _UserhomePageState extends State<UserhomePage> {
                         itemCount: courses.length,
                         itemBuilder: (context, index) {
                           final courseName = courses[index].id;
-                          final details =
-                              (courseDetails[index]['classdetails'] ?? 'N/A')
-                                  .toString()
-                                  .toUpperCase();
+                          final details = (courseDetails[index]
+                                      ['classdetails'] ??
+                                  'N/A'.toString())
+                              .toUpperCase();
+                          final nm = courseName.toUpperCase();
 
                           return Card(
                               margin: const EdgeInsets.symmetric(
@@ -355,7 +469,7 @@ class _UserhomePageState extends State<UserhomePage> {
                               ),
                               child: ListTile(
                                   title: Text(
-                                    "$courseName - $details",
+                                    "$nm - $details",
                                     style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w600),
