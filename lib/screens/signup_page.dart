@@ -17,44 +17,60 @@ class _SignupPageState extends State<SignupPage> {
   TextEditingController nametxt = TextEditingController();
   bool isvisible = false;
   bool isvisible1 = false;
-  bool issame() {
-    return passtxt1.text == passtxt2.text;
+
+  bool validateFields() {
+    if (nametxt.text.isEmpty ||
+        emailtxt.text.isEmpty ||
+        passtxt1.text.isEmpty ||
+        passtxt2.text.isEmpty) {
+      showError("All fields are required.");
+      return false;
+    }
+    if (!RegExp(r"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$").hasMatch(emailtxt.text)) {
+      showError("Enter a valid email.");
+      return false;
+    }
+    if (passtxt1.text.length < 6) {
+      showError("Password must be at least 6 characters.");
+      return false;
+    }
+    if (passtxt1.text != passtxt2.text) {
+      showError("Passwords do not match.");
+      return false;
+    }
+    return true;
+  }
+
+  void showError(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   void signupUser() async {
+    if (!validateFields()) return;
+
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevents the user from closing the dialog
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return const Center(
-          child: CircularProgressIndicator(
-            color: Colors.deepPurple,
-          ),
-        );
+            child: CircularProgressIndicator(color: Colors.deepPurple));
       },
     );
-    if (issame()) {
-      String res = await Authentication().signupUser(
-          email: emailtxt.text, password: passtxt1.text, name: nametxt.text);
-      if (res == "Success") {
-        print("Success");
-        Navigator.pop(context);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => UserhomePage(
-                      name: nametxt.text,
-                    )));
-      } else {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(res)),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Password are not same")),
+
+    String res = await Authentication().signupUser(
+        email: emailtxt.text, password: passtxt1.text, name: nametxt.text);
+
+    Navigator.pop(context);
+
+    if (res == "Success") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => UserhomePage(name: nametxt.text)),
       );
+    } else {
+      showError(res);
     }
   }
 
@@ -65,129 +81,87 @@ class _SignupPageState extends State<SignupPage> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 20.0),
-                    child: Text(
-                      "Sign up",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
-                    ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 20.0),
+                child: Text("Sign up",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: Image.asset("lib/asserts/logo.jpg",
+                    height: 200, width: 200),
+              ),
+              const SizedBox(height: 30),
+              inputField(emailtxt, "Enter your email", Icons.mail),
+              inputField(nametxt, "Enter your name", Icons.person),
+              passwordField(passtxt1, "Enter password", isvisible,
+                  () => setState(() => isvisible = !isvisible)),
+              passwordField(passtxt2, "Confirm password", isvisible1,
+                  () => setState(() => isvisible1 = !isvisible1)),
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: ElevatedButton(
+                  onPressed: signupUser,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100)),
+                    minimumSize: const Size(135, 53),
                   ),
+                  child: const Text("Sign up",
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 30.0),
-                  child: Image.asset("lib/asserts/logo.jpg",
-                      height: 200, width: 200),
-                ),
-                const SizedBox(height: 30),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(left: 40.0, right: 40.0, top: 30),
-                  child: TextField(
-                    controller: emailtxt,
-                    decoration: InputDecoration(
-                        hintText: "Enter your mail ",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        suffixIcon: const Icon(Icons.mail)),
-                  ),
-                ),
-                Padding(
-                    padding:
-                        const EdgeInsets.only(left: 40.0, right: 40.0, top: 30),
-                    child: TextField(
-                        controller: nametxt,
-                        decoration: InputDecoration(
-                            hintText: "Enter your name",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            suffixIcon: const Icon(Icons.person)))),
-                Padding(
-                    padding:
-                        const EdgeInsets.only(left: 40.0, right: 40.0, top: 30),
-                    child: TextField(
-                        controller: passtxt1,
-                        obscureText: !isvisible,
-                        decoration: InputDecoration(
-                          hintText: "Enter password",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          suffixIcon: InkWell(
-                            onTap: () => setState(() {
-                              isvisible = !isvisible;
-                            }),
-                            child: Icon(!isvisible
-                                ? Icons.visibility_off
-                                : Icons.visibility),
-                          ),
-                        ))),
-                Padding(
-                    padding:
-                        const EdgeInsets.only(left: 40.0, right: 40.0, top: 30),
-                    child: TextField(
-                        controller: passtxt2,
-                        obscureText: !isvisible1,
-                        decoration: InputDecoration(
-                          hintText: "Confirm password",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          suffixIcon: InkWell(
-                            onTap: () => setState(() {
-                              isvisible1 = !isvisible1;
-                            }),
-                            child: Icon(!isvisible1
-                                ? Icons.visibility_off
-                                : Icons.visibility),
-                          ),
-                        ))),
-                Padding(
-                  padding: const EdgeInsets.only(top: 30.0),
-                  child: ElevatedButton(
-                    // ignore: avoid_print
-                    onPressed: () {
-                      signupUser();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      minimumSize: const Size(135, 53),
-                    ),
-                    child: const Text(
-                      "Sign up",
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const loginPage()));
-                  },
-                  child: const Text(
-                    "Already Have an account?",
+              ),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const loginPage())),
+                child: const Text("Already Have an account?",
                     style: TextStyle(
                         fontSize: 14,
                         color: Colors.lightBlue,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
+                        fontWeight: FontWeight.bold)),
+              ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget inputField(
+      TextEditingController controller, String hint, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 40.0, right: 40.0, top: 20),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: hint,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+          suffixIcon: Icon(icon),
+        ),
+      ),
+    );
+  }
+
+  Widget passwordField(TextEditingController controller, String hint,
+      bool isVisible, VoidCallback toggleVisibility) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 40.0, right: 40.0, top: 20),
+      child: TextField(
+        controller: controller,
+        obscureText: !isVisible,
+        decoration: InputDecoration(
+          hintText: hint,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+          suffixIcon: InkWell(
+              onTap: toggleVisibility,
+              child: Icon(isVisible ? Icons.visibility : Icons.visibility_off)),
         ),
       ),
     );

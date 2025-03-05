@@ -367,7 +367,7 @@ class _UserhomePageState extends State<UserhomePage> {
                 onTap: () async {
                   final Uri url = Uri.parse("https://www.sjctni.edu/");
                   if (await canLaunchUrl(url)) {
-                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                    await launchUrl(url, mode: LaunchMode.inAppBrowserView);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text("Could not launch URL")),
