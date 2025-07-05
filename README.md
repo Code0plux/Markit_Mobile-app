@@ -33,24 +33,23 @@ It ensures secure access, supports multiple staff per course, and generates clea
 
 ## 📷 Screenshots
 
-> ## 📷 Screenshots
+## 📷 Screenshots
 
 ### 🔐 Login Screen
-![Login Screen](lib/asserts/loginpage.png)
+<img src="lib/asserts/loginpage.png" width="400"/>
 
-### 📝 Sign Up Screen (from asserts folder)
-![Mark Entry Screen (asserts)](lib/asserts/signup.png)
+### 📝 Sign Up Screen 
+<img src="lib/asserts/signup.png" width="400"/>
 
-### 📄 Home Screen (from asserts folder)
-![PDF Download Screen (asserts)](lib/asserts/homescreen.png)
+### 📄 Home Screen 
+<img src="lib/asserts/homescreen.png" width="400"/>
 
-### 📝 Mark Entry Screen (from root lib)
-![Mark Entry Screen (root)](lib/Markentryscreen.png)
+### 📝 Mark Entry Screen 
+<img src="lib/asserts/Markentryscreen.png" width="400"/>
 
-### 📄 PDF Download Screen (from root lib)
-![PDF Download Screen (root)](lib/Markreport.png)
+### 📄 PDF Download Screen 
+<img src="lib/asserts/Markreport.png" width="400"/>
 
----
 
 ## 🔗 Links
 
