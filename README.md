@@ -54,7 +54,7 @@ It ensures secure access, supports multiple staff per course, and generates clea
 ## 🔗 Links
 
 - [Live Demo](#) (if hosted)
-- [APK Download](#) (optional)
+- [![Download APK](https://img.shields.io/badge/Download-APK-blue?logo=android)](https://github.com/Code0plux/Markit_Mobile-app/releases/download/v1.0.0/Markit.apk)
 - [Project Report](#) (optional)
 
 ---
