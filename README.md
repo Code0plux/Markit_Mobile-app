@@ -33,7 +33,22 @@ It ensures secure access, supports multiple staff per course, and generates clea
 
 ## 📷 Screenshots
 
-> *(Add screenshots here to show login page, mark entry form, PDF, etc.)*
+> ## 📷 Screenshots
+
+### 🔐 Login Screen
+![Login Screen](lib/asserts/LoginScreen.png)
+
+### 📝 Mark Entry Screen (from asserts folder)
+![Mark Entry Screen (asserts)](lib/asserts/Markentryscreen.png)
+
+### 📄 PDF Download Screen (from asserts folder)
+![PDF Download Screen (asserts)](lib/asserts/Pdfdownloadscreen.png)
+
+### 📝 Mark Entry Screen (from root lib)
+![Mark Entry Screen (root)](lib/Markentryscreen.png)
+
+### 📄 PDF Download Screen (from root lib)
+![PDF Download Screen (root)](lib/Pdfdownloadscreen.png)
 
 ---
 
