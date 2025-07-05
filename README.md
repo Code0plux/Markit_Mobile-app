@@ -53,9 +53,8 @@ It ensures secure access, supports multiple staff per course, and generates clea
 
 ## 🔗 Links
 
-- [Live Demo](#) (if hosted)
 - [![Download APK](https://img.shields.io/badge/Download-APK-blue?logo=android)](https://github.com/Code0plux/Markit_Mobile-app/releases/download/v1.0.0/Markit.apk)
-- [Project Report](#) (optional)
+- ➡️ [Download Project Report (PDF)](lib/asserts/Markitreport.pdf)
 
 ---
 
@@ -63,5 +62,6 @@ It ensures secure access, supports multiple staff per course, and generates clea
 
 1️⃣ Clone the repository:
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/Code0plux/Markit_Mobile-app.git
+cd Markit_Mobile-app
+
