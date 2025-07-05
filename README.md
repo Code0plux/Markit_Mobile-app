@@ -33,8 +33,6 @@ It ensures secure access, supports multiple staff per course, and generates clea
 
 ## 📷 Screenshots
 
-## 📷 Screenshots
-
 ### 🔐 Login Screen
 <img src="lib/asserts/loginpage.png" width="400"/>
 
